@@ -9,17 +9,14 @@ router.get('/', function (req, res, next) {
 })
 
 // 加入购物车
-
 router.post('/addCart', function (req, res, next) {
   let userId = '100000077'
   var productId = req.body.productId
   var User = require('../models/user')
 
   User.findOne({userId: userId}, function (err, userDoc) {
-    // console.log(userDoc);
     // 当添加商品的时候，先去数据库里面查询一下，这个商品是否存在，
     // 如果存在，就让它的productNum 加1，如果不存在，就添加这个商品。
-
     let goodItem = ''
     // 先去数据库里面查询一下
     userDoc.cartList.forEach(function (item) {
@@ -96,6 +93,7 @@ router.post('/cartList', function (req, res, next) {
     }
   })
 })
+
 router.post('/getCartCount', function (req, res, next) {
   let userId = '100000077'
   User.findOne({'userId': userId}, function (err, doc) {
@@ -136,7 +134,6 @@ router.post('/cartEdit', function (req, res, next) {
         result: ''
       })
     } else {
-      console.log(cartCount())
       res.json({
         status: 0,
         msg: '',
@@ -165,52 +162,6 @@ router.post('/cartDel', function (req, res, next) {
     }
   })
 })
-
-// 全选的接口
-router.post('/editCheckAll', function (req, res, next) {
-  let userId = req.cookies.userId,
-    checkAll = req.body.checkAll ? '1' : '0'
-
-  User.findOne({'userId': userId}, function (err, user) {
-    if (err) {
-      res.json({
-        status: '1',
-        msg: err.message,
-        result: ''
-      })
-    } else {
-      user.cartList.forEach((item) => {
-        item.checked = checkAll
-      })
-      user.save(function (err1, doc) {
-        if (err1) {
-          res.json({status: '1', msg: err.message, result: ''})
-        } else {
-          res.json({status: '0', msg: '', result: '操作成功'})
-        }
-      })
-    }
-  })
-})
-
-const cartCount = function () {
-  let userId = '100000077'
-  User.findOne({'userId': userId}, function (err, doc) {
-    if (err) {
-      return err.message
-    } else {
-      let cartList = doc.cartList
-      let cartCount = 0
-      cartList.map(function (item) {
-        cartCount += parseFloat(item.productNum)
-      })
-      console.log(cartCount)
-      return cartCount
-    }
-  })
-}
-
-console.log(cartCount())
 router.get('*', function (req, res, next) {
   res.send('台湾是中国不可分割的一部分！')
 })
